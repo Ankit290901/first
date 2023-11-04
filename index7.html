@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Expense Tracker</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+
+        <!-- Expense Entry Form -->
+        <form>
+            <div class="form-group">
+                <label for="expenseName">Expense Name</label>
+                <input type="text" class="form-control" id="expenseName" placeholder="Enter expense name">
+            </div>
+            <div class="form-group">
+                <label for="expenseAmount">Expense Amount</label>
+                <input type="number" class="form-control" id="expenseAmount" placeholder="Enter expense amount">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+        </form>
+
+        <!-- Updated Expense List -->
+        <h2>Expense List</h2>
+        <ul class="list-group" id="expenseList">
+            <!-- Expense items will be dynamically added here -->
+        </ul>
+    </div>
+
+    <script>
+        // Load expenses from local storage when the page loads
+        window.onload = loadExpenses;
+
+        // Function to load expenses from local storage
+        function loadExpenses() {
+            const expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+            expenses.forEach((expense) => {
+                addExpenseToList(expense.name, expense.amount);
+            });
+        }
+
+        // Function to add an expense to the list and local storage
+        function addExpense() {
+            const expenseName = document.getElementById("expenseName").value;
+            const expenseAmount = document.getElementById("expenseAmount").value;
+
+            if (expenseName && expenseAmount) {
+                addExpenseToList(expenseName, expenseAmount);
+
+                // Clear input fields after adding an expense
+                document.getElementById("expenseName").value = "";
+                document.getElementById("expenseAmount").value = "";
+
+                // Save the expenses to local storage
+                saveExpensesToLocalStorage();
+            }
+        }
+
+        // Function to add an expense to the list
+        function addExpenseToList(name, amount) {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+            listItem.innerHTML = `
+                ${name}: $${amount}
+                <button class="btn btn-warning btn-sm float-right" onclick="editExpense(this)">Edit</button>
+                <button class="btn btn-danger btn-sm float-right" onclick="deleteExpense(this)">Delete</button>
+            `;
+            document.getElementById("expenseList").appendChild(listItem);
+        }
+
+        // Function to edit an expense
+        function editExpense(button) {
+            const listItem = button.parentElement;
+            const expenseText = listItem.textContent.trim().split("EditDelete")[0];
+            const expenseParts = expenseText.split(": $");
+            const expenseName = expenseParts[0];
+            const expenseAmount = expenseParts[1];
+
+            // Replace the expense item with an editable form
+            listItem.innerHTML = `
+                <input type="text" class="form-control" value="${expenseName}" id="editedName">
+                <input type="number" class="form-control" value="${expenseAmount}" id="editedAmount">
+                <button class="btn btn-success btn-sm" onclick="saveEdit(this)">Save</button>
+            `;
+        }
+
+        // Function to save an edited expense
+        function saveEdit(button) {
+            const editedName = document.getElementById("editedName").value;
+            const editedAmount = document.getElementById("editedAmount").value;
+
+            if (editedName && editedAmount) {
+                const listItem = button.parentElement;
+                listItem.innerHTML = `
+                    ${editedName}: $${editedAmount}
+                    <button class="btn btn-warning btn-sm float-right" onclick="editExpense(this)">Edit</button>
+                    <button class="btn btn-danger btn-sm float-right" onclick="deleteExpense(this)">Delete</button>
+                `;
+
+                // Save the expenses to local storage
+                saveExpensesToLocalStorage();
+            }
+        }
+
+        // Function to delete an expense
+        function deleteExpense(button) {
+            const listItem = button.parentElement;
+            listItem.remove();
+
+            // Save the expenses to local storage
+            saveExpensesToLocalStorage();
+        }
+
+        // Function to save expenses to local storage
+        function saveExpensesToLocalStorage() {
+            const expenses = [];
+            const listItems = document.querySelectorAll("li");
+            listItems.forEach((item) => {
+                const text = item.textContent.trim().split("EditDelete")[0];
+                const parts = text.split(": $");
+                const name = parts[0];
+                const amount = parts[1];
+                expenses.push({ name, amount });
+            });
+            localStorage.setItem("expenses", JSON.stringify(expenses));
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

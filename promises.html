@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const posts = [
+    { title: 'post one', body: 'this is post one' },
+    { title: 'post Two', body: 'this is post two' }
+];
+
+// Function to get posts
+function getPosts() {
+    setTimeout(() => {
+        let output = '';
+        posts.forEach(post => {
+            output += `<li>${post.title}</li>`;
+        });
+        document.body.innerHTML = output;
+    }, 1000);
+}
+
+// Function to create a post and update last activity time
+function createPost(post) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            posts.push(post);
+            resolve();
+        }, 2000);
+    });
+}
+
+// Function to update last user activity time
+function updateLastUserActivityTime() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const lastActivityTime = new Date().toISOString();
+            resolve(lastActivityTime);
+        }, 1000);
+    });
+}
+
+// Example usage
+createPost({ title: 'post Three', body: 'this is post three' })
+    .then(() => updateLastUserActivityTime())
+    .then(updatedTime => {
+        console.log('Posts:', posts);
+        console.log('Last Activity Time:', updatedTime);
+
+        // Delete the last post
+        posts.pop();
+
+        // Log the remaining posts after deleting the last one
+        console.log('Remaining Posts after deleting last post:', posts);
+    })
+    .catch(err => {
+        console.error('Error:', err);
+    });
+
+// Initially display posts
+getPosts();
+
+  </script>
+</body>
+</html>

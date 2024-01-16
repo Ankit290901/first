@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Form</title>
+</head>
+<body>
+    <h1>Simple Form</h1>
+    <form id="myForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Stored Data:</h2>
+    <ul id="dataList"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+     <script>
+        // Function to handle form submission
+        document.getElementById("myForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Get input values
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+
+            // Create an object to store the data
+            const userData = { name, email };
+
+            axios.post(" https://crudcrud.com/api/247fd345e2d34a48962c700d3b836655/appointmentData",userData)
+            .then((Response)=> {
+                console.log(Response)
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+
+            // Store data in local storage
+           // let savedData = JSON.parse(localStorage.getItem("userData")) || [];
+            //savedData.push(userData);
+            //localStorage.setItem("userData", JSON.stringify(savedData));
+
+            // Clear form inputs
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+
+            // Display data on the screen
+            displayData();
+        });
+
+        // Function to display stored data on the screen
+        function displayData() {
+            const dataList = document.getElementById("dataList");
+            dataList.innerHTML = "";
+
+            const savedData = JSON.parse(localStorage.getItem("userData")) || [];
+            savedData.forEach((userData, index) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `Entry ${index + 1}: Name - ${userData.name}, Email - ${userData.email}`;
+
+                // Create an Edit button for each entry
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.addEventListener("click", function () {
+                    // Prompt the user to enter a new email
+                    const newEmail = prompt("Enter a new email address:");
+                    if (newEmail !== null) {
+                        // Update the email in both local storage and the UI
+                        userData.email = newEmail;
+                        savedData[index] = userData;
+                        localStorage.setItem("userData", JSON.stringify(savedData));
+                        listItem.textContent = `Entry ${index + 1}: Name - ${userData.name}, Email - ${userData.email}`;
+                    }
+                });
+
+                // Create a Delete button for each entry
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    // Remove the entry from local storage
+                    savedData.splice(index, 1);
+                    localStorage.setItem("userData", JSON.stringify(savedData));
+
+                    // Remove the entry from the UI
+                    dataList.removeChild(listItem);
+
+                    // Update the display of remaining entries
+                    displayData();
+                });
+
+                listItem.appendChild(editButton);
+                listItem.appendChild(deleteButton);
+                dataList.appendChild(listItem);
+            });
+        }
+
+        // Initial display of stored data
+        displayData();
+    </script>
+</body>
+</html>

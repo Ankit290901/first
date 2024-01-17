@@ -32,7 +32,7 @@
             // Create an object to store the data
             const userData = { name, email };
 
-            axios.post(" https://crudcrud.com/api/247fd345e2d34a48962c700d3b836655/appointmentData",userData)
+            axios.post("  https://crudcrud.com/api/21170c4632a64c48b60217ea1b3cac2e/studentData",userData)
             .then((Response)=> {
                 console.log(Response)
             })
@@ -40,10 +40,10 @@
                 console.log(err)
             });
 
-            // Store data in local storage
-           // let savedData = JSON.parse(localStorage.getItem("userData")) || [];
+           // store data in local storage
+           //let savedData = JSON.parse(localStorage.getItem("userData")) || [];
             //savedData.push(userData);
-            //localStorage.setItem("userData", JSON.stringify(savedData));
+           // localStorage.setItem("userData", JSON.stringify(savedData));
 
             // Clear form inputs
             document.getElementById("name").value = "";

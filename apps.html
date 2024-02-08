@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bus Booking</h1>
+        <div class="form-group">
+            <label for="filter">Filter:</label>
+            <select id="filter">
+                <option value="all">All Buses</option>
+                <option value="bus1">Bus 1</option>
+                <option value="bus2">Bus 2</option>
+                <option value="bus3">Bus 3</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" id="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
+            <input type="text" id="phone" placeholder="Enter your phone number">
+        </div>
+        <div class="form-group">
+            <label for="car">Car Number:</label>
+            <select id="car">
+                <option value="bus1">Bus 1</option>
+                <option value="bus2">Bus 2</option>
+                <option value="bus3">Bus 3</option>
+            </select>
+        </div>
+        <button class="btn" id="bookBtn">Book</button>
+        <ul id="dataList"></ul>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            // Function to handle form submission
+            document.getElementById("bookBtn").addEventListener("click", function() {
+                // Get input values
+                const name = document.getElementById("name").value;
+                const email = document.getElementById("email").value;
+                const car = document.getElementById("car").value;
+
+                // Create a new user
+                axios.post("https://crudcrud.com/api/e37c45301a70458a96d73ca6c799a5c0/studentData", { name, email, car })
+                    .then((response) => {
+                        console.log(response);
+                        // Display data on the screen
+                        displayData();
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+
+                // Clear form inputs
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+            });
+
+            // Function to display stored data on the screen
+            function displayData() {
+                axios.get("https://crudcrud.com/api/e37c45301a70458a96d73ca6c799a5c0/studentData")
+                    .then((response) => {
+                        const dataList = document.getElementById("dataList");
+                        dataList.innerHTML = "";
+
+                        const savedData = response.data;
+                        const filter = document.getElementById("filter").value;
+
+                        for (let i = 0; i < savedData.length; i++) {
+                            const userData = savedData[i];
+
+                            // Apply filter logic
+                            if (filter === "all" || userData.car === filter) {
+                                // Create list items and buttons using userData
+                                const listItem = document.createElement("li");
+                                listItem.textContent = `Entry ${i + 1}: Name - ${userData.name}, Email - ${userData.email}, Car - ${userData.car}`;
+
+                                // Create Edit and Delete buttons
+                                const editButton = document.createElement("button");
+                                editButton.textContent = "Edit";
+                                editButton.addEventListener("click", function() {
+                                    // Edit functionality
+                                    handleEditClick(userData);
+                                });
+
+                                const deleteButton = document.createElement("button");
+                                deleteButton.innerHTML = "Delete &#x1F5D1"; // Unicode for trash can icon
+                                deleteButton.addEventListener("click", function() {
+                                    // Delete functionality
+                                    deleteUserData(userData._id);
+                                });
+
+                                listItem.appendChild(editButton);
+                                listItem.appendChild(deleteButton);
+                                dataList.appendChild(listItem);
+                            }
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            }
+
+            // Function to handle edit button click
+            function handleEditClick(userData) {
+                // Set the editing user ID
+                editingUserId = userData._id;
+
+                // Populate form with user data
+                document.getElementById("name").value = userData.name;
+                document.getElementById("email").value = userData.email;
+                document.getElementById("car").value = userData.car;
+            }
+
+            // Function to delete user data
+            function deleteUserData(userId) {
+                axios.delete(`https://crudcrud.com/api/e37c45301a70458a96d73ca6c799a5c0/studentData/${userId}`)
+                    .then((response) => {
+                        console.log(response);
+                        // Display updated data on the screen
+                        displayData();
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
